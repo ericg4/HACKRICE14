@@ -31,7 +31,6 @@ def get_csv_column_count(file_path):
 
 
 def processCSV(file_path, col_list):
-
     old_file = os.path.join("CSV_Files", file_path)
     new_file = os.path.join("EditedCSVs", file_path)
 
@@ -49,6 +48,8 @@ def processCSV(file_path, col_list):
         reader = csv.reader(file)
         data = list(reader)
 
+    print(f"Limiting file {file_path} to the following columns: \n{data[0]}")
+
     # Edit the specified cell
     for row in data:
         for index in sorted(total_list, reverse=True):
@@ -60,7 +61,7 @@ def processCSV(file_path, col_list):
         writer = csv.writer(file)
         writer.writerows(data)
 
-    print("Columns removed successfully")
+    print("Columns removed successfully \n\n")
 
 
 def compressData(file_path, target_path):
@@ -102,6 +103,7 @@ def compressData(file_path, target_path):
 
 
 def combineDatasets(dataPath1, dataPath2, targetPath):
+    print(f"Combining Datasets {dataPath1} and {dataPath2}. ")
     data1 = os.path.join("EditedCSVs", dataPath1)
     data2 = os.path.join("EditedCSVs", dataPath2)
 
@@ -113,13 +115,16 @@ def combineDatasets(dataPath1, dataPath2, targetPath):
 
     # Perform an inner join on the 'ID' column (keeps only rows where 'ID' is common in both dataframes)
     merged_df = pd.merge(df2, df1, on='pnum2', how='inner')
+    print(f"Merged Datasets {data1} and {data2} into {newCSV}.\n\n")
+    rows, columns = merged_df.shape
+    print(f"Size of {newCSV} is H: {rows}, W: {columns}")
 
     # Save the merged dataframe to a new CSV file
     merged_df.to_csv(newCSV, index=False)
 
 
 
-col2_list = [0, 4, 6, 12, 18]
+# col2_list = [0, 4, 6, 12, 18]
 col2_list = [0, 4]
 file_path = 'DataSet2.csv'
 
@@ -127,13 +132,15 @@ col1_list = [525, 10, 6, 12, 15, 18, 21, 38, 217, 218, 219,
             220, 221, 222, 223, 224, 225, 226, 227, 228, 
             229, 230, 231, 232, 233, 234, 41]
 
-#col1_list = list(range(1945))
+# col1_list = list(range(1945))
 
 # exceptionsList = [527,528,529,530,531,532,533,935,936,937,960,978,980,981,982,1449,1450,527,928,950,967,968,1434]
+# exceptionsList = [527,528,529,530,531,532,533,935,936,937,960,978,980,981,982,1449,1450]
 
-# for item in exceptionsList:
-#     if item in col1_list:
-#         col1_list.remove(item)
+# for idx in exceptionsList:
+#     if idx in col1_list:
+#         col1_list.remove(idx)
+    
 
 processCSV(file_path, col2_list)
 processCSV("DataSet1.csv", col1_list)

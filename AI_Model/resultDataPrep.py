@@ -31,8 +31,8 @@ def get_csv_column_count(file_path):
 
 
 def processCSV(file_path, col_list):
-    old_file = os.path.join("CSV_Files", file_path)
-    new_file = os.path.join("EditedCSVs", file_path)
+    old_file = os.path.join("AI_Model/CSV_Files", file_path)
+    new_file = os.path.join("AI_Model/EditedCSVs", file_path)
 
     copy_csv_overwrite(old_file, new_file)
 
@@ -66,8 +66,8 @@ def processCSV(file_path, col_list):
 
 def compressData(file_path, target_path):
 
-    old_file = os.path.join("EditedCSVs", file_path)
-    new_file = os.path.join("EditedCSVs", target_path)
+    old_file = os.path.join("AI_Model/EditedCSVs", file_path)
+    new_file = os.path.join("AI_Model/EditedCSVs", target_path)
 
 
     with open(old_file, 'r') as file:
@@ -104,10 +104,10 @@ def compressData(file_path, target_path):
 
 def combineDatasets(dataPath1, dataPath2, targetPath):
     print(f"Combining Datasets {dataPath1} and {dataPath2}. ")
-    data1 = os.path.join("EditedCSVs", dataPath1)
-    data2 = os.path.join("EditedCSVs", dataPath2)
+    data1 = os.path.join("AI_Model/EditedCSVs", dataPath1)
+    data2 = os.path.join("AI_Model/EditedCSVs", dataPath2)
 
-    newCSV = os.path.join("EditedCSVs", targetPath)
+    newCSV = os.path.join("AI_Model/EditedCSVs", targetPath)
     os.makedirs(os.path.dirname(newCSV), exist_ok=True)
 
     df1 = pd.read_csv(data1)  # The first CSV file
@@ -132,7 +132,7 @@ col1_list = [525, 10, 6, 12, 15, 18, 21, 38, 217, 218, 219,
             220, 221, 222, 223, 224, 225, 226, 227, 228, 
             229, 230, 231, 232, 233, 234, 41]
 
-# col1_list = list(range(1945))
+#col1_list = list(range(1945))
 
 # exceptionsList = [527,528,529,530,531,532,533,935,936,937,960,978,980,981,982,1449,1450,527,928,950,967,968,1434]
 # exceptionsList = [527,528,529,530,531,532,533,935,936,937,960,978,980,981,982,1449,1450]

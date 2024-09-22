@@ -18,6 +18,8 @@ from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.optimizers import Adam
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import r2_score,mean_squared_error
+
 
 
 
@@ -33,13 +35,38 @@ except IndexError:
 def load_data(file_path):
     data = pd.read_csv(file_path)
     # columns_to_convert = [527,528,529,530,531,532,533,935,936,937,960,978,980,981,982,1449,1450]
+
     # for col in columns_to_convert:
-    #     data.iloc[:, col] = pd.to_numeric(data.iloc[:, col], errors='coerce')
+    #     # data.iloc[:, col] = pd.to_numeric(data.iloc[:, col], errors='coerce')
+    #     data.drop(data.columns[columns_to_convert], axis=1)
+
+    data = data.replace(' ', np.nan)
+    print(f"Replaced empty strings with {np.nan}")
+
+    for column in data.columns:
+        # Convert column to numeric, coercing errors to NaN
+        data[column] = pd.to_numeric(data[column], errors='coerce')
+        
+        # Calculate median
+        median_value = data[column].median()
+        
+        # Fill NaN values with median
+        data[column].fillna(median_value, inplace=True)
+    
+    data = data[data['tcinpsty'].le(100000) & data['tcinpsty'].notna()]
+
+    # Step 3: Reset the index of the filtered DataFrame (optional)
+    data = data.reset_index(drop=True)
+
+
+    # Verify that there are no more missing values
+    missing_values_after = data.isnull().any().any()
+    print("Are there any missing values?", missing_values_after)
 
 
     X = data.drop(columns=['tcinpsty', 'pnum2'], axis=1)  # Assuming 'cost' is the target column
     y = data['tcinpsty']
-    print("Loaded Data")    
+    print("Loaded Data")
     return X, y
 
 # Fill in the missing data
@@ -208,26 +235,41 @@ def evaluate_model(model, X_test, y_test):
     plt.title('Actual vs Predicted Medical Costs')
     plt.show()
 
+def evaluate_forest(model, X_test, y_test):
+    y_pred = model.predict(X_test)
+    mse = mean_squared_error(y_test, y_pred)
+    print(f"Mean Squared Error on test set: {mse}")
+    
+    y_pred = model.predict(X_test)
+    
+    plt.figure(figsize=(10, 6))
+    plt.scatter(y_test, y_pred)
+    plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--', lw=2)
+    plt.xlabel('Actual Cost')
+    plt.ylabel('Predicted Cost')
+    plt.title('Actual vs Predicted Medical Costs')
+    plt.show()
+
 # Main execution
 if __name__ == "__main__":
     # Load data
-    X, y = load_data('EditedCSVs/combinedData.csv')  # Replace with your actual data file
+    X, y = load_data('AI_Model/EditedCSVs/combinedData.csv')  # Replace with your actual data file
     #X, y = fillMissing(X, y)
     
     # Preprocess data
     X_train, X_test, y_train, y_test = preprocess_data(X, y)
     
     # Create model
-    model = create_model(X_train.shape[1])
+    #model = create_model(X_train.shape[1])
 
     model = RandomForestRegressor()
-    model.fit(X_train, y_train)
+    history = model.fit(X_train, y_train)
 
     # Train model
     #history = train_model(model, X_train, y_train, X_test, y_test)
     
     # Evaluate model
-    evaluate_model(model, X_test, y_test)
+    evaluate_forest(model, X_test, y_test)
     
     # Plot training history
     plt.figure(figsize=(10, 6))
